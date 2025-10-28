@@ -115,16 +115,33 @@ void clip_and_draw_line(SDL_Renderer* renderer, double x0, double y0, double x1,
 
             // Encontra a interseção
             if (outcodeOut & TOP) {           // Ponto está acima
-                x = x0 + (x1 - x0) * (Y_MAX - y0) / (y1 - y0);
+                if (y1 != y0) {
+                    x = x0 + (x1 - x0) * (Y_MAX - y0) / (y1 - y0);
+                } else {
+                    // Degenerate: horizontal line. Keep x as the outside point's x.
+                    x = x0;
+                }
                 y = Y_MAX;
             } else if (outcodeOut & BOTTOM) { // Ponto está abaixo
-                x = x0 + (x1 - x0) * (Y_MIN - y0) / (y1 - y0);
+                if (y1 != y0) {
+                    x = x0 + (x1 - x0) * (Y_MIN - y0) / (y1 - y0);
+                } else {
+                    x = x0;
+                }
                 y = Y_MIN;
             } else if (outcodeOut & RIGHT) {  // Ponto está à direita
-                y = y0 + (y1 - y0) * (X_MAX - x0) / (x1 - x0);
+                if (x1 != x0) {
+                    y = y0 + (y1 - y0) * (X_MAX - x0) / (x1 - x0);
+                } else {
+                    y = y0;
+                }
                 x = X_MAX;
             } else if (outcodeOut & LEFT) {   // Ponto está à esquerda
-                y = y0 + (y1 - y0) * (X_MIN - x0) / (x1 - x0);
+                if (x1 != x0) {
+                    y = y0 + (y1 - y0) * (X_MIN - x0) / (x1 - x0);
+                } else {
+                    y = y0;
+                }
                 x = X_MIN;
             }
 
@@ -285,15 +302,39 @@ int main(int argc, char* argv[]) {
     int num_vertices_pen = 5;
 
 
+    SDL_SetWindowTitle(window, "Modo 0: Contorno do triângulo");
+
     // --- Loop Principal ---
     int running = 1; 
     SDL_Event e;     
+    // Circular os desenhos com Enter
+    int mode = 0; // 0..4
+    const int NUM_MODES = 6;
 
     while (running) {
         // 4. Processa eventos na fila
         while (SDL_PollEvent(&e) != 0) {
             if (e.type == SDL_QUIT) {
                 running = 0; 
+            } else if (e.type == SDL_KEYDOWN) {
+                // Enter cycles to next mode; Escape quits
+                if (e.key.keysym.sym == SDLK_RETURN) {
+                    mode = (mode + 1) % NUM_MODES;
+                    // Update window title to reflect mode
+                    char title[64];
+                    switch (mode) {
+                        case 0: snprintf(title, sizeof(title), "Modo 0: Contorno do triângulo"); break;
+                        case 1: snprintf(title, sizeof(title), "Modo 1: Triângulo preenchido"); break;
+                        case 2: snprintf(title, sizeof(title), "Modo 2: Desenhar pentágono"); break;
+                        case 3: snprintf(title, sizeof(title), "Modo 3: Mostrar caixa de recorte"); break;
+                        case 4: snprintf(title, sizeof(title), "Modo 4: Linha recortada"); break;
+                        case 5: snprintf(title, sizeof(title), "Modo 5: Linha rejeitada"); break;
+                        default: snprintf(title, sizeof(title), "Modo"); break;
+                    }
+                    SDL_SetWindowTitle(window, title);
+                } else if (e.key.keysym.sym == SDLK_ESCAPE) {
+                    running = 0;
+                }
             }
         }
 
@@ -302,29 +343,41 @@ int main(int argc, char* argv[]) {
         SDL_RenderClear(renderer);
 
         // 6. --- INÍCIO DOS DESENHOS ---
-
-        // Exemplo 1: Preenche o triângulo (Verde)
-        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255); // Verde
-        fill_polygon_scanline(renderer, triangulo, num_vertices_tri);
-
-        // Exemplo 2: Desenha o contorno do pentágono (Vermelho)
-        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); // Vermelho
-        draw_polygon(renderer, pentagono, num_vertices_pen);
-
-        // Exemplo 3: Desenha a caixa de recorte (Cinza)
+        
         SDL_Rect clip_rect = { X_MIN, Y_MIN, X_MAX - X_MIN, Y_MAX - Y_MIN };
-        SDL_SetRenderDrawColor(renderer, 100, 100, 100, 255); // Cinza
-        SDL_RenderDrawRect(renderer, &clip_rect);
-        
-        // Exemplo 4: Desenha uma linha que será recortada (Azul)
-        // Esta linha vai de (50, 50) até (600, 450)
-        SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255); // Azul
-        clip_and_draw_line(renderer, 50.0, 50.0, 600.0, 450.0);
-        
-        // Exemplo 5: Desenha uma linha que será totalmente rejeitada (Amarela)
-        // Esta linha está totalmente à esquerda da caixa
-        SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255); // Amarelo
-        clip_and_draw_line(renderer, 10.0, 10.0, 50.0, 400.0);
+
+        switch (mode) {
+            case 0: //  // Desenhar triangulo
+                SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+                draw_polygon(renderer, triangulo, num_vertices_tri);
+                break;
+            case 1: // Encher Triangulo
+                SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+                fill_polygon_scanline(renderer, triangulo, num_vertices_tri);
+                break;
+            case 2: // Desenhar polígono (Pentagono)
+                SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+                draw_polygon(renderer, pentagono, num_vertices_pen);
+                break;
+            case 3: // Caixa para fazer o clip
+                SDL_SetRenderDrawColor(renderer, 100, 100, 100, 255);
+                SDL_RenderDrawRect(renderer, &clip_rect);
+                break;
+            case 4: // Linha com o clip
+                SDL_SetRenderDrawColor(renderer, 100, 100, 100, 255);
+                SDL_RenderDrawRect(renderer, &clip_rect);
+                SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+                clip_and_draw_line(renderer, 50.0, 50.0, 600.0, 450.0);
+                break;
+            case 5: // Linha feita com o clip fora da caixa
+                SDL_SetRenderDrawColor(renderer, 100, 100, 100, 255);
+                SDL_RenderDrawRect(renderer, &clip_rect);
+                SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
+                clip_and_draw_line(renderer, 10.0, 10.0, 50.0, 400.0);
+                break;
+            default:
+                break;
+        }
 
 
         // --- FIM DOS DESENHOS ---
