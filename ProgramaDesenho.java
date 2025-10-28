@@ -4,8 +4,6 @@
     ESCOPO DA PRIMEIRA ATIVIDADE
  */
 
-
-package Atividade1;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;

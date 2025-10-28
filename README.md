@@ -58,11 +58,9 @@ A seguir temos instruções genéricas caso você queira compilar/rodar um proje
 Compilar/rodar um único arquivo Java (JDK instalado):
 
 ```powershell
-# Compilar
-javac src\com\exemplo\Main.java
 
 # Executar
-java -cp src com.exemplo.Main
+java ProgramaDesenho.java
 ```
 
 ## Dicas e ajustes rápidos
@@ -70,3 +68,7 @@ java -cp src com.exemplo.Main
 - Para mudar a resolução da janela, altere `SCREEN_WIDTH` e `SCREEN_HEIGHT` no topo de `main.c`.
 - Para ajustar a janela de recorte, edite `X_MIN`, `X_MAX`, `Y_MIN` e `Y_MAX` (definidos perto das funções de recorte).
 - Para ver mensagens de debug, você pode adicionar `printf` em pontos-chave do código e recompilar.
+
+## Limitações
+
+Tive dificuldades para entender o recorte de primitivas (Cohen Sutherland), então tive que usar IA para poder realizar essa atividade, toda aquela parte de output code e como aplicar para a linha.
