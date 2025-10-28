@@ -7,7 +7,7 @@ Este repositório contém um programa em C que usa SDL2 (`main.c`) com implement
 - Desenho de contorno de polígonos (usando linhas)
 - Preenchimento de polígonos por Scanline
 
-O programa é interativo: pressione Enter para ciclar entre modos e Esc para sair. Os modos (na ordem) são:
+O programa é interativo: pressione Enter dentro da tela para ciclar entre modos e Esc para sair. Os modos (na ordem) são:
 
 - Modo 0: Contorno do triângulo (inicial)
 - Modo 1: Triângulo preenchido
