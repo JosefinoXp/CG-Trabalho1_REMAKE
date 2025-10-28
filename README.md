@@ -1,4 +1,4 @@
-# Projeto CG-Trabalho1_REMAKE
+# Projeto CG-Trabalho1
 
 Este repositório contém um programa em C que usa SDL2 (`main.c`) com implementações dos seguintes algoritmos gráficos (todos dentro de `main.c`):
 
@@ -53,7 +53,7 @@ Observações
 
 ## Projeto Java (instruções genéricas)
 
-A seguir temos instruções genéricas caso você queira compilar/rodar um projeto Java.
+A seguir as instruções para rodar o arquivo Java.
 
 Compilar/rodar um único arquivo Java (JDK instalado):
 
